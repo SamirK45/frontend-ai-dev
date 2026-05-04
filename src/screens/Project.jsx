@@ -623,9 +623,15 @@ const Project = () => {
 
             <motion.button
               onClick={async () => {
+                if (!webContainer) {
+                  console.error("WebContainer is not ready yet. It may have failed to boot — ensure COOP/COEP headers are configured.");
+                  alert("WebContainer is still loading. Please wait a moment and try again.");
+                  return;
+                }
+
                 await webContainer.spawn("npx", ["kill-port", "3000"]);
                 await webContainer.mount(fileTree);
-                const installProcess = await webContainer?.spawn("npm", [
+                const installProcess = await webContainer.spawn("npm", [
                   "install",
                 ]);
                 installProcess.output.pipeTo(
@@ -640,7 +646,7 @@ const Project = () => {
                   runProcess.kill();
                 }
 
-                let tempRunProcess = await webContainer?.spawn("npm", [
+                let tempRunProcess = await webContainer.spawn("npm", [
                   "start",
                 ]);
 
