@@ -162,12 +162,12 @@ const Register = () => {
       navigate("/verify-email");
     } catch (err) {
       console.error("Registration error:", err);
-      const errorMessage = 
-        err.response?.data?.errors || 
-        err.response?.data?.message || 
+      const errorMessage =
+        err.response?.data?.errors ||
+        err.response?.data?.message ||
         (typeof err.response?.data === 'string' ? err.response.data : null) ||
         "Registration failed";
-        
+
       setErrors({ submit: Array.isArray(errorMessage) ? errorMessage[0].msg : errorMessage });
     } finally {
       setIsLoading(false);
@@ -237,7 +237,7 @@ const Register = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Link to="/landing-page" className="auth-logo">
+        <Link to="/" className="auth-logo">
           <div className="auth-logo-icon">
             <Brain size={22} />
           </div>
