@@ -202,12 +202,12 @@ const VerifyCode = () => {
       }
     } catch (err) {
       console.error("Verification error:", err);
-      const errorMessage = 
-        err.response?.data?.errors || 
-        err.response?.data?.message || 
+      const errorMessage =
+        err.response?.data?.errors ||
+        err.response?.data?.message ||
         (typeof err.response?.data === 'string' ? err.response.data : null) ||
         "Invalid code. Please check and try again.";
-        
+
       setError(Array.isArray(errorMessage) ? errorMessage[0].msg : errorMessage);
     } finally {
       setIsLoading(false);
