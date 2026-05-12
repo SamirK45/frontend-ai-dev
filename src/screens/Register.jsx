@@ -184,7 +184,8 @@ const Register = () => {
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
       setEmail(res.data.user.email);
-      navigate("/verify-email");
+      toast.success("Verification email sent to your inbox!");
+      setTimeout(() => navigate("/verify-email"), 2000);
     } catch (err) {
       console.error("Registration error:", err);
       const errorMessage =
@@ -476,7 +477,7 @@ const Register = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.55, duration: 0.5 }}
-                onClick={notify}
+
               >
                 {isLoading ? (
                   <div className="auth-spinner" />
