@@ -132,6 +132,24 @@ const Register = () => {
     return () => window.removeEventListener("mousemove", handleMouse);
   }, []);
 
+  // Allowed popular email domains
+  const ALLOWED_DOMAINS = [
+    "gmail.com", "googlemail.com",
+    "outlook.com", "hotmail.com", "live.com", "msn.com",
+    "yahoo.com", "yahoo.co.in", "yahoo.co.uk",
+    "protonmail.com", "proton.me",
+    "icloud.com", "me.com", "mac.com",
+    "aol.com",
+    "zoho.com", "zohomail.in",
+    "mail.com",
+    "yandex.com", "yandex.ru",
+    "tutanota.com", "tuta.io",
+    "fastmail.com",
+    "gmx.com", "gmx.net",
+    "rediffmail.com",
+    "yopmail.com", "mailforspam.com", "mailinator.com",
+  ];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -139,6 +157,13 @@ const Register = () => {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     const newErrors = {};
+
+    // Email domain validation
+    const emailDomain = email.split("@")[1]?.toLowerCase();
+    if (!emailDomain || !ALLOWED_DOMAINS.includes(emailDomain)) {
+      newErrors.email =
+        "Please use a valid email from a popular provider (Gmail, Outlook, Yahoo, etc.)";
+    }
 
     if (!passwordRegex.test(password)) {
       newErrors.password =
@@ -318,6 +343,11 @@ const Register = () => {
                     autoComplete="email"
                   />
                 </div>
+                {errors.email && (
+                  <motion.p className="auth-field-error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    {errors.email}
+                  </motion.p>
+                )}
               </motion.div>
 
               {/* Password */}
