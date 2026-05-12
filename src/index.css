@@ -1027,9 +1027,13 @@ body {
 .auth-logo {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.5rem;
   text-decoration: none;
   cursor: pointer;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 .auth-logo-icon {

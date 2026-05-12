@@ -5,7 +5,7 @@ import axios from "../config/axios.js";
 import { UserContext } from "../context/user.context.jsx";
 import { emailContext } from "../context/email.context.jsx";
 import {
-  Brain, Eye, EyeOff, ArrowRight, Sparkles, Lock, Mail, User, Shield,
+  Eye, EyeOff, ArrowRight, Sparkles, Lock, Mail, User, Shield,
 } from "lucide-react";
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -238,10 +238,8 @@ const Register = () => {
         transition={{ duration: 0.6 }}
       >
         <Link to="/" className="auth-logo">
-          <div className="auth-logo-icon">
-            <Brain size={22} />
-          </div>
-          <span className="auth-logo-text">AIdev</span>
+          <span className="logo-icon">◈</span>
+          <span className="logo-text">Code<span className="logo-accent">Mate</span> AI</span>
         </Link>
       </motion.header>
 

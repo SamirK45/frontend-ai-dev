@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "../config/axios.js";
 import { UserContext } from "../context/user.context.jsx";
-import { Brain, Eye, EyeOff, ArrowRight, Sparkles, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Sparkles, Lock, Mail } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -232,10 +232,8 @@ const Login = () => {
         transition={{ duration: 0.6 }}
       >
         <Link to="/" className="auth-logo">
-          <div className="auth-logo-icon">
-            <Brain size={22} />
-          </div>
-          <span className="auth-logo-text">AIdev</span>
+          <span className="logo-icon">◈</span>
+          <span className="logo-text">Code<span className="logo-accent">Mate</span> AI</span>
         </Link>
       </motion.header>
 

@@ -149,8 +149,6 @@ body {
 }
 
 .nav-inner {
-    max-width: 1200px;
-    margin: 0 auto;
     height: 70px;
     display: flex;
     align-items: center;
