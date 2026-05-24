@@ -75,7 +75,7 @@ function TerminalWindow() {
     <div className="terminal">
       <div className="terminal-header">
         <span className="dot dot-red" /><span className="dot dot-yellow" /><span className="dot dot-green" />
-        <span className="terminal-title">codemate — zsh</span>
+        <span className="terminal-title">CodeMate — zsh</span>
       </div>
       <div className="terminal-body">
         {lines.map((line, i) => (
