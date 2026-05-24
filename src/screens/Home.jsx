@@ -184,7 +184,7 @@ const Home = () => {
           <div className="home-nav-logo">
             <Brain size={20} />
           </div>
-          <span className="home-nav-brand">AIdev</span>
+          <span className="home-nav-brand">CodeMate</span>
         </div>
 
         <div className="home-nav-right">
