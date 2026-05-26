@@ -2339,6 +2339,191 @@ body {
   color: #a78bfa;
 }
 
+/* Explorer Add Button */
+.proj-explorer-add-btn {
+  margin-left: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  color: #6b6c85;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.proj-explorer-add-btn:hover {
+  background: rgba(124, 92, 252, 0.15);
+  border-color: rgba(124, 92, 252, 0.3);
+  color: #a78bfa;
+}
+
+/* New File Input */
+.proj-new-file-input {
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.proj-new-file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(124, 92, 252, 0.04);
+}
+
+.proj-new-file-icon {
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+
+.proj-new-file-text {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(124, 92, 252, 0.2);
+  border-radius: 6px;
+  color: #e8e8f0;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.proj-new-file-text:focus {
+  border-color: rgba(124, 92, 252, 0.5);
+  box-shadow: 0 0 0 2px rgba(124, 92, 252, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.proj-new-file-text::placeholder {
+  color: #4a4b65;
+}
+
+.proj-new-file-confirm {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.proj-new-file-confirm:hover {
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+}
+
+.proj-new-file-cancel {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: #8b8ca8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.proj-new-file-cancel:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+/* File Item Layout (with delete button) */
+.proj-file-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: left;
+}
+
+.proj-file-item-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.proj-file-delete-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: #4a4b65;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.proj-file-item:hover .proj-file-delete-btn {
+  opacity: 1;
+}
+
+.proj-file-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+/* Tabs Actions (Save + Run) */
+.proj-tabs-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+/* Save Button */
+.proj-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(124, 92, 252, 0.2);
+  background: rgba(124, 92, 252, 0.08);
+  color: #a78bfa;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.proj-save-btn:hover {
+  background: rgba(124, 92, 252, 0.15);
+  border-color: rgba(124, 92, 252, 0.35);
+  box-shadow: 0 2px 10px rgba(124, 92, 252, 0.2);
+}
+
 /* Code Editor Container */
 .proj-editor-container {
   flex: 1;
@@ -2408,7 +2593,6 @@ body {
   align-items: center;
   gap: 6px;
   padding: 7px 16px;
-  margin-right: 10px;
   border-radius: 10px;
   border: none;
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
