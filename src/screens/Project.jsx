@@ -1,4 +1,10 @@
-import React, { createRef, useState, useContext, useEffect, useRef } from "react";
+import React, {
+  createRef,
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "../config/axios";
@@ -13,10 +19,32 @@ import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-dark.css";
 import { getWebContainer } from "../config/webContainer";
 import {
-  Brain, Users, UserPlus, X, Send, Plus, Sparkles, Wrench,
-  Play, FolderOpen, Code2, Globe, ChevronRight, MessageSquare,
-  Bot, FileCode2, Pencil, Zap,
+  Brain,
+  Users,
+  UserPlus,
+  X,
+  Send,
+  Plus,
+  Sparkles,
+  Wrench,
+  Play,
+  FolderOpen,
+  Code2,
+  Globe,
+  ChevronRight,
+  MessageSquare,
+  Bot,
+  FileCode2,
+  Pencil,
+  Zap,
+  Save,
+  FilePlus,
+  Check,
+  Trash2,
 } from "lucide-react";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function SyntaxHighlightedCode(props) {
   const ref = useRef(null);
@@ -44,7 +72,7 @@ const Project = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const { user } = useContext(UserContext);
   const [fileTree, setfileTree] = useState(
-    location.state.project.fileTree || {}
+    location.state.project.fileTree || {},
   );
 
   const [openFiles, setopenFiles] = useState([]);
@@ -61,6 +89,9 @@ const Project = () => {
 
   const [currentUser, setCurrentUser] = useState(null);
 
+  const [newFile, setNewFile] = useState("");
+  const [showNewFileInput, setShowNewFileInput] = useState(false);
+
   useEffect(() => {
     initializeSocket(project._id);
 
@@ -73,11 +104,12 @@ const Project = () => {
 
     receiveMessage("project-message", (data) => {
       setCurrentUser(data.sender);
-      
+
       // Check if sender is the current user (handle both string and object sender)
-      const senderEmail = typeof data.sender === 'object' ? data.sender?.email : data.sender;
-      const isAi = typeof data.sender === 'object' && data.sender?._id === 'ai';
-      
+      const senderEmail =
+        typeof data.sender === "object" ? data.sender?.email : data.sender;
+      const isAi = typeof data.sender === "object" && data.sender?._id === "ai";
+
       if (senderEmail !== user.email || isAi) {
         let message;
         try {
@@ -208,18 +240,22 @@ const Project = () => {
     let messageObject;
     try {
       // Handle case where message is already an object
-      if (typeof message === 'object' && message !== null) {
+      if (typeof message === "object" && message !== null) {
         messageObject = message;
-      } else if (typeof message === 'string') {
+      } else if (typeof message === "string") {
         messageObject = JSON.parse(message);
       } else {
         messageObject = { text: String(message) };
       }
     } catch {
-      messageObject = { text: typeof message === 'string' ? message : String(message) };
+      messageObject = {
+        text: typeof message === "string" ? message : String(message),
+      };
     }
 
-    const displayText = messageObject.text || (typeof message === 'string' ? message : JSON.stringify(message));
+    const displayText =
+      messageObject.text ||
+      (typeof message === "string" ? message : JSON.stringify(message));
 
     return (
       <div className="proj-ai-card">
@@ -261,7 +297,7 @@ const Project = () => {
     ];
 
     return allMentions.filter((mention) =>
-      mention.name.toLowerCase().includes(mentionFilter.toLowerCase())
+      mention.name.toLowerCase().includes(mentionFilter.toLowerCase()),
     );
   };
 
@@ -311,23 +347,207 @@ const Project = () => {
   };
 
   // Non-JS language file extensions to detect non-JS projects
-  const nonJsExtensions = ['.py', '.go', '.java', '.rs', '.rb', '.php', '.cpp', '.c', '.cs', '.swift', '.kt', '.dart', '.scala', '.zig', '.lua', '.r', '.pl', '.ex', '.exs', '.hs', '.ml', '.ts'];
-  const webContainerFiles = ['server.js', 'package.json'];
+  const nonJsExtensions = [
+    ".py",
+    ".go",
+    ".java",
+    ".rs",
+    ".rb",
+    ".php",
+    ".cpp",
+    ".c",
+    ".cs",
+    ".swift",
+    ".kt",
+    ".dart",
+    ".scala",
+    ".zig",
+    ".lua",
+    ".r",
+    ".pl",
+    ".ex",
+    ".exs",
+    ".hs",
+    ".ml",
+    ".ts",
+  ];
+  const webContainerFiles = ["server.js", "package.json"];
 
   // Get files to display in explorer (hide server.js/package.json for non-JS projects)
   const getDisplayFiles = () => {
     const allFiles = Object.keys(fileTree || {});
-    const hasNonJsFiles = allFiles.some(f => nonJsExtensions.some(ext => f.endsWith(ext)));
+    const hasNonJsFiles = allFiles.some((f) =>
+      nonJsExtensions.some((ext) => f.endsWith(ext)),
+    );
     // Only hide server.js/package.json if there are non-JS language files present
     // This means for pure Node.js/Express projects, they'll still be visible
     if (hasNonJsFiles) {
-      return allFiles.filter(f => !webContainerFiles.includes(f));
+      return allFiles.filter((f) => !webContainerFiles.includes(f));
     }
     return allFiles;
   };
 
   const displayFiles = getDisplayFiles();
   const fileCount = displayFiles.length;
+
+  const allowedExtensions = [
+    ".js",
+    ".jsx",
+    ".ts",
+    ".tsx",
+    ".html",
+    ".css",
+    ".scss",
+    ".json",
+    ".md",
+    ".txt",
+  ];
+
+  const notifyError = (msg) => toast.error(msg);
+
+  const notifySuccess = (msg) => toast.success(msg);
+  const notifyWarning = (msg) => toast.warning(msg);
+
+  const setContentBasedOnExtension = (extension) => {
+    let defaultContent = "";
+
+    switch (extension) {
+      case ".html":
+        defaultContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Document</title>
+</head>
+<body>
+
+</body>
+</html>`;
+        break;
+
+      case ".css":
+        defaultContent = `body {
+  margin: 0;
+  padding: 0;
+}`;
+        break;
+
+      case ".js":
+        defaultContent = `console.log("Hello World");`;
+        break;
+
+      case ".jsx":
+        defaultContent = `export default function Component() {
+  return (
+    <div>
+      Component
+    </div>
+  );
+}`;
+        break;
+
+      case ".json":
+        defaultContent = `{
+  
+}`;
+        break;
+
+      case ".md":
+        defaultContent = `# New File`;
+        break;
+
+      default:
+        defaultContent = "";
+    }
+
+    return defaultContent;
+  };
+
+  const createNewFile = () => {
+    const fileName = newFile.trim();
+
+    // Empty check
+    if (!fileName) {
+      notifyError("File name is required");
+      return;
+    }
+
+    // Invalid characters check
+    const invalidChars = /[\\/:*?"<>|]/;
+
+    if (invalidChars.test(fileName)) {
+      notifyError("File name contains invalid characters");
+      return;
+    }
+
+    // Extension check
+    if (!fileName.includes(".")) {
+      notifyError("File extension is required (e.g. .js, .html)");
+      return;
+    }
+
+    // Extract extension
+    const extension = fileName.slice(fileName.lastIndexOf(".")).toLowerCase();
+
+    // Allowed extension validation
+    if (!allowedExtensions.includes(extension)) {
+      notifyWarning(`Unsupported file type: ${extension}`);
+      return;
+    }
+
+    // Duplicate file check
+    if (fileTree[fileName]) {
+      notifyWarning("File already exists");
+      return;
+    }
+
+    const defaultContent = setContentBasedOnExtension(extension);
+
+    const updatedFileTree = {
+      ...fileTree,
+      [fileName]: {
+        file: {
+          contents: defaultContent,
+        },
+      },
+    };
+
+    setfileTree(updatedFileTree);
+    setopenFiles((prev) => [...new Set([...prev, fileName])]);
+    setcurrentFile(fileName);
+
+    // Persist to backend
+    saveFileTree(updatedFileTree);
+    notifySuccess(`Created ${fileName}`);
+
+    // Reset UI
+    setNewFile("");
+    setShowNewFileInput(false);
+  };
+
+  const deleteFile = (fileName) => {
+    const updatedFileTree = { ...fileTree };
+    delete updatedFileTree[fileName];
+    setfileTree(updatedFileTree);
+
+    // Remove from open files
+    setopenFiles((prev) => prev.filter((f) => f !== fileName));
+
+    // If we deleted the current file, switch to another or null
+    if (currentFile === fileName) {
+      const remaining = Object.keys(updatedFileTree);
+      setcurrentFile(remaining.length > 0 ? remaining[0] : null);
+    }
+
+    saveFileTree(updatedFileTree);
+    notifySuccess(`Deleted ${fileName}`);
+  };
+
+  const handleSaveCurrentFile = () => {
+    if (!currentFile || !fileTree[currentFile]) return;
+    saveFileTree(fileTree);
+    notifySuccess(`Saved ${currentFile}`);
+  };
 
   return (
     <main className="proj-main">
@@ -345,9 +565,12 @@ const Project = () => {
               <Brain size={16} />
             </div>
             <div className="proj-chat-header-info">
-              <span className="proj-chat-project-name">{project.name || "Project"}</span>
+              <span className="proj-chat-project-name">
+                {project.name || "Project"}
+              </span>
               <span className="proj-chat-member-count">
-                {project.users?.length || 0} member{project.users?.length !== 1 ? "s" : ""}
+                {project.users?.length || 0} member
+                {project.users?.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -399,17 +622,20 @@ const Project = () => {
                 <MessageSquare size={32} />
               </div>
               <p className="proj-chat-empty-title">Start a conversation</p>
-              <p className="proj-chat-empty-sub">Describe what you want to build or change</p>
+              <p className="proj-chat-empty-sub">
+                Describe what you want to build or change
+              </p>
             </div>
           )}
 
           {chatMessages.map((messageObject, index) => {
-            const isAi = typeof messageObject.sender === 'object'
-              ? messageObject.sender?._id === "ai"
-              : messageObject.sender === "ai";
+            const isAi =
+              typeof messageObject.sender === "object"
+                ? messageObject.sender?._id === "ai"
+                : messageObject.sender === "ai";
             const senderName = isAi
               ? "ai"
-              : typeof messageObject.sender === 'string'
+              : typeof messageObject.sender === "string"
                 ? messageObject.sender.split("@")[0]
                 : messageObject.sender?.email?.split("@")[0] || "Unknown";
 
@@ -429,7 +655,9 @@ const Project = () => {
                     </>
                   ) : (
                     <>
-                      <div className="proj-msg-avatar">{senderName.charAt(0).toUpperCase()}</div>
+                      <div className="proj-msg-avatar">
+                        {senderName.charAt(0).toUpperCase()}
+                      </div>
                       <span>{senderName}</span>
                     </>
                   )}
@@ -460,7 +688,10 @@ const Project = () => {
                     key={mention.id}
                     className="proj-mention-item"
                     onClick={() => {
-                      const beforeCursor = messages.substring(0, cursorPosition);
+                      const beforeCursor = messages.substring(
+                        0,
+                        cursorPosition,
+                      );
                       const afterCursor = messages.substring(cursorPosition);
                       const lastAtIndex = beforeCursor.lastIndexOf("@");
                       const newMessage =
@@ -482,7 +713,9 @@ const Project = () => {
                     )}
                     <div className="proj-mention-info">
                       <span className="proj-mention-name">{mention.name}</span>
-                      <span className="proj-mention-email">{mention.email}</span>
+                      <span className="proj-mention-email">
+                        {mention.email}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -543,7 +776,10 @@ const Project = () => {
                   <Users size={18} />
                   <span>Collaborators</span>
                 </h2>
-                <button className="proj-side-close" onClick={() => setisSidePanelOpen(false)}>
+                <button
+                  className="proj-side-close"
+                  onClick={() => setisSidePanelOpen(false)}
+                >
                   <X size={18} />
                 </button>
               </div>
@@ -562,7 +798,9 @@ const Project = () => {
                         {u.email?.charAt(0).toUpperCase()}
                       </div>
                       <div className="proj-collab-info">
-                        <span className="proj-collab-name">{u.email?.split("@")[0]}</span>
+                        <span className="proj-collab-name">
+                          {u.email?.split("@")[0]}
+                        </span>
                         <span className="proj-collab-email">{u.email}</span>
                       </div>
                       <div className="proj-collab-status" />
@@ -582,20 +820,99 @@ const Project = () => {
             <FolderOpen size={13} />
             <span>Explorer</span>
             <span className="proj-explorer-count">{fileCount}</span>
+            <motion.button
+              className="proj-explorer-add-btn"
+              onClick={() => setShowNewFileInput(!showNewFileInput)}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              title="Create new file"
+            >
+              <FilePlus size={14} />
+            </motion.button>
           </div>
+
+          {/* New File Input */}
+          <AnimatePresence>
+            {showNewFileInput && (
+              <motion.div
+                className="proj-new-file-input"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="proj-new-file-row">
+                  <FileCode2 size={13} className="proj-new-file-icon" />
+                  <input
+                    type="text"
+                    value={newFile}
+                    onChange={(e) => setNewFile(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") createNewFile();
+                      if (e.key === "Escape") {
+                        setShowNewFileInput(false);
+                        setNewFile("");
+                      }
+                    }}
+                    placeholder="filename.ext"
+                    autoFocus
+                    className="proj-new-file-text"
+                  />
+                  <motion.button
+                    className="proj-new-file-confirm"
+                    onClick={createNewFile}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    title="Create file"
+                  >
+                    <Check size={14} />
+                  </motion.button>
+                  <motion.button
+                    className="proj-new-file-cancel"
+                    onClick={() => {
+                      setShowNewFileInput(false);
+                      setNewFile("");
+                    }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    title="Cancel"
+                  >
+                    <X size={14} />
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="proj-explorer-files">
             {displayFiles.map((file) => (
-              <button
+              <div
                 key={file}
-                onClick={() => {
-                  setcurrentFile(file);
-                  setopenFiles([...new Set([...openFiles, file])]);
-                }}
                 className={`proj-file-item ${currentFile === file ? "proj-file-active" : ""}`}
               >
-                <i className={getFileIcon(file)} />
-                <span>{file}</span>
-              </button>
+                <button
+                  className="proj-file-item-btn"
+                  onClick={() => {
+                    setcurrentFile(file);
+                    setopenFiles([...new Set([...openFiles, file])]);
+                  }}
+                >
+                  <i className={getFileIcon(file)} />
+                  <span>{file}</span>
+                </button>
+                <motion.button
+                  className="proj-file-delete-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteFile(file);
+                  }}
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
+                  title={`Delete ${file}`}
+                >
+                  <Trash2 size={12} />
+                </motion.button>
+              </div>
             ))}
           </div>
         </div>
@@ -605,73 +922,93 @@ const Project = () => {
           {/* File Tabs Bar */}
           <div className="proj-tabs-bar">
             <div className="proj-tabs">
-              {openFiles.filter(f => {
-                const allFiles = Object.keys(fileTree || {});
-                const hasNonJsFiles = allFiles.some(fn => nonJsExtensions.some(ext => fn.endsWith(ext)));
-                return hasNonJsFiles ? !webContainerFiles.includes(f) : true;
-              }).map((file) => (
-                <button
-                  key={file}
-                  onClick={() => setcurrentFile(file)}
-                  className={`proj-file-tab ${currentFile === file ? "proj-file-tab-active" : ""}`}
-                >
-                  <span className="proj-tab-dot" />
-                  {file}
-                </button>
-              ))}
+              {openFiles
+                .filter((f) => {
+                  const allFiles = Object.keys(fileTree || {});
+                  const hasNonJsFiles = allFiles.some((fn) =>
+                    nonJsExtensions.some((ext) => fn.endsWith(ext)),
+                  );
+                  return hasNonJsFiles ? !webContainerFiles.includes(f) : true;
+                })
+                .map((file) => (
+                  <button
+                    key={file}
+                    onClick={() => setcurrentFile(file)}
+                    className={`proj-file-tab ${currentFile === file ? "proj-file-tab-active" : ""}`}
+                  >
+                    <span className="proj-tab-dot" />
+                    {file}
+                  </button>
+                ))}
             </div>
 
-            <motion.button
-              onClick={async () => {
-                if (!webContainer) {
-                  console.error("WebContainer is not ready yet. It may have failed to boot — ensure COOP/COEP headers are configured.");
-                  alert("WebContainer is still loading. Please wait a moment and try again.");
-                  return;
-                }
+            <div className="proj-tabs-actions">
+              <motion.button
+                onClick={handleSaveCurrentFile}
+                className="proj-save-btn"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                title="Save current file (Ctrl+S)"
+              >
+                <Save size={14} />
+                <span>Save</span>
+              </motion.button>
+              <motion.button
+                onClick={async () => {
+                  if (!webContainer) {
+                    console.error(
+                      "WebContainer is not ready yet. It may have failed to boot — ensure COOP/COEP headers are configured.",
+                    );
+                    alert(
+                      "WebContainer is still loading. Please wait a moment and try again.",
+                    );
+                    return;
+                  }
 
-                await webContainer.spawn("npx", ["kill-port", "3000"]);
-                await webContainer.mount(fileTree);
-                const installProcess = await webContainer.spawn("npm", [
-                  "install",
-                ]);
-                installProcess.output.pipeTo(
-                  new WritableStream({
-                    write(data) {
-                      console.log(data);
-                    },
-                  })
-                );
+                  await webContainer.spawn("npx", ["kill-port", "3000"]);
+                  await webContainer.mount(fileTree);
+                  const installProcess = await webContainer.spawn("npm", [
+                    "install",
+                  ]);
+                  installProcess.output.pipeTo(
+                    new WritableStream({
+                      write(data) {
+                        console.log(data);
+                      },
+                    }),
+                  );
 
-                if (runProcess) {
-                  runProcess.kill();
-                }
+                  if (runProcess) {
+                    runProcess.kill();
+                  }
 
-                let tempRunProcess = await webContainer.spawn("npm", [
-                  "start",
-                ]);
+                  let tempRunProcess = await webContainer.spawn("npm", [
+                    "start",
+                  ]);
 
-                tempRunProcess.output.pipeTo(
-                  new WritableStream({
-                    write(data) {
-                      console.log(data);
-                    },
-                  })
-                );
+                  tempRunProcess.output.pipeTo(
+                    new WritableStream({
+                      write(data) {
+                        console.log(data);
+                      },
+                    }),
+                  );
 
-                setrunProcess(tempRunProcess);
+                  setrunProcess(tempRunProcess);
 
-                webContainer.on("server-ready", (port, url) => {
-                  console.log(`Server is ready at ${url}:${port}`);
-                  setiframeUrl(url);
-                });
-              }}
-              className="proj-run-btn"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-            >
-              <Play size={14} fill="currentColor" />
-              <span>Run</span>
-            </motion.button>
+                  webContainer.on("server-ready", (port, url) => {
+                    console.log(`Server is ready at ${url}:${port}`);
+                    setiframeUrl(url);
+                  });
+                }}
+                className="proj-run-btn"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+              >
+                <Play size={14} fill="currentColor" />
+                <span>Run</span>
+              </motion.button>
+            </div>
           </div>
 
           {/* File Path Breadcrumb */}
@@ -706,7 +1043,7 @@ const Project = () => {
                   }}
                   dangerouslySetInnerHTML={{
                     __html: hljs.highlightAuto(
-                      fileTree[currentFile].file.contents
+                      fileTree[currentFile].file.contents,
                     ).value,
                   }}
                   style={{
@@ -773,7 +1110,10 @@ const Project = () => {
                       <p>Invite team members to this project</p>
                     </div>
                   </div>
-                  <button className="proj-modal-close" onClick={() => setShowUserModal(false)}>
+                  <button
+                    className="proj-modal-close"
+                    onClick={() => setShowUserModal(false)}
+                  >
                     <X size={18} />
                   </button>
                 </div>
@@ -786,7 +1126,9 @@ const Project = () => {
                         key={u._id}
                         onClick={() => handleUserSelect(u._id)}
                         className={`proj-modal-user ${
-                          Array.from(selectedUsers).includes(u._id) ? "proj-modal-user-selected" : ""
+                          Array.from(selectedUsers).includes(u._id)
+                            ? "proj-modal-user-selected"
+                            : ""
                         }`}
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
@@ -795,12 +1137,20 @@ const Project = () => {
                           {u.email?.charAt(0).toUpperCase()}
                         </div>
                         <div className="proj-modal-user-info">
-                          <span className="proj-modal-user-name">{u.email?.split("@")[0]}</span>
-                          <span className="proj-modal-user-email">{u.email}</span>
+                          <span className="proj-modal-user-name">
+                            {u.email?.split("@")[0]}
+                          </span>
+                          <span className="proj-modal-user-email">
+                            {u.email}
+                          </span>
                         </div>
-                        <div className={`proj-modal-check ${
-                          Array.from(selectedUsers).includes(u._id) ? "proj-modal-check-active" : ""
-                        }`}>
+                        <div
+                          className={`proj-modal-check ${
+                            Array.from(selectedUsers).includes(u._id)
+                              ? "proj-modal-check-active"
+                              : ""
+                          }`}
+                        >
                           {Array.from(selectedUsers).includes(u._id) && (
                             <i className="ri-check-line" />
                           )}
@@ -810,7 +1160,10 @@ const Project = () => {
                 </div>
 
                 <div className="proj-modal-footer">
-                  <button className="proj-modal-btn-cancel" onClick={() => setShowUserModal(false)}>
+                  <button
+                    className="proj-modal-btn-cancel"
+                    onClick={() => setShowUserModal(false)}
+                  >
                     Cancel
                   </button>
                   <motion.button
@@ -830,6 +1183,24 @@ const Project = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="dark"
+        toastStyle={{
+          background: "rgba(18, 19, 38, 0.95)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(124, 92, 252, 0.15)",
+          borderRadius: "12px",
+          fontFamily: "var(--font-sans)",
+          fontSize: "13px",
+        }}
+      />
     </main>
   );
 };
